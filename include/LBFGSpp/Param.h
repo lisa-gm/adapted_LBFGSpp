@@ -329,7 +329,8 @@ public:
     ///
     LBFGSBParam()
     {
-        m              = 6;
+        m              = 4;
+        std::cout << "number of stored previous gradients : " << m << std::endl;
         epsilon        = Scalar(1e-5);
         epsilon_rel    = Scalar(1e-5);
         past           = 1;

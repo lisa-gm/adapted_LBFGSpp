@@ -6,6 +6,9 @@
 
 //#define PRINT_MSG
 
+#include <iomanip>  // for std::setprecision()
+
+
 #include <Eigen/Core>
 #include "LBFGSpp/Param.h"
 #include "LBFGSpp/BFGSMat.h"
@@ -89,6 +92,23 @@ public:
         // The length of lag for objective function value to test convergence
         const int fpast = m_param.past;
 
+        // printout linesearch condition
+        if(mpi_rank == 0){
+            std::cout << "lineserach condition : ";
+
+            if(m_param.linesearch == 1){            
+                std::cout << "Armijo." << std::endl;
+            }
+            else if(m_param.linesearch == 2){
+                std::cout << "Wolfe." << std::endl;
+            } else if (m_param.linesearch == 3){
+                std::cout << "Strong Wolfe." << std::endl;
+            } else {
+                std::cout << "unknown. m_param.linesearch = " << m_param.linesearch << std::endl;
+                exit(1);
+            }
+        }
+
         // Evaluate function and compute gradient
         fx = f(x, m_grad);
         Scalar gnorm = m_grad.norm();
@@ -140,24 +160,24 @@ public:
             //a Convergence test -- gradient
             if(gnorm <= m_param.epsilon || gnorm <= m_param.epsilon_rel * x.norm())
             {	
-#ifdef PRINT_MSG
+//#ifdef PRINT_MSG
     		    if(mpi_rank == 0){
                     std::cout << "exited. epsilon = " << m_param.epsilon << ", epsilon_rel * xnorm = " << m_param.epsilon_rel * x.norm() << std::endl;
                     std::cout << "gnorm = " << gnorm << std::endl;
                 }
-#endif
+//#endif
     		    return k;
             }
             // Convergence test -- objective function value
             if(fpast > 0)
             {
                 const Scalar fxd = m_fx[k % fpast];
-                // I CHANGED THIS !!
-                if(k >= fpast && abs(fxd - fx) <= m_param.delta){ //* std::max(std::max(abs(fx), abs(fxd)), Scalar(1))){
-#ifdef PRINT_MSG
+                // I CHANGED THIS at time to simply be <= m_param.delta !!
+                if(k >= fpast && abs(fxd - fx) <= m_param.delta){ // * std::max(std::max(abs(fx), abs(fxd)), Scalar(1))){ // ){ 
+//#ifdef PRINT_MSG
                     if(mpi_rank == 0)
-                        std::cout << "convergence criterion met abs(f(x_k) - f(x_k-1)) " << abs(fxd - fx) << std::endl;
-#endif
+                        std::cout << "convergence criterion met abs(f(x_k) - f(x_k-1)) = " << std::fixed << std::setprecision(8) << abs(fxd - fx) << std::endl;
+//#endif
                     return k;
                 }
 

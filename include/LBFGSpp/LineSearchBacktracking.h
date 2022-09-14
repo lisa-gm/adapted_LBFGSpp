@@ -4,12 +4,10 @@
 #ifndef LINE_SEARCH_BACKTRACKING_H
 #define LINE_SEARCH_BACKTRACKING_H
 
-
 #include <Eigen/Core>
 #include <stdexcept>  // std::runtime_error
 
 //#define PRINT_MSG
-
 
 namespace LBFGSpp {
 
@@ -69,6 +67,17 @@ public:
 	    }
 #endif
 
+
+#ifdef PRINT_MSG
+    if(mpi_rank == 0){
+        std::cout << "\nNEW LINESEARCH" << std::endl;
+        std::cout << "fx_init = " << fx_init << ", dg_init = " << dg_init << ", norm(drt) = " << drt.norm() << std::endl;
+        //std::cout << "grad    = " << grad.transpose() << std::endl;
+        std::cout << " new drt     = " << drt.transpose() << std::endl;
+        std::cout << "dot(grad, drt) / (norm(grad)*norm(drt) = " << dg_init / (grad.norm()*drt.norm()) << std::endl;
+    }
+#endif
+
         // was originally clearly 0
 	if(dg_init > 0){
         // ORIGINAL
@@ -93,14 +102,6 @@ public:
         const Scalar fx_init = fx;
         // Projection of gradient on the search direction
         const Scalar dg_init = grad.dot(drt);
-
-#ifdef PRINT_MSG
-        if(mpi_rank == 0){
-            std::cout << "dg_init = " << dg_init << ", norm(drt) = " << drt.norm() << std::endl;
-            //std::cout << "grad    = " << grad.transpose() << std::endl;
-            std::cout << " new drt     = " << drt.transpose() << std::endl;
-        }
-#endif
 	}
 
         const Scalar test_decr = param.ftol * dg_init;
@@ -114,27 +115,59 @@ public:
             // Evaluate this candidate
             fx = f(x, grad);
 
-#ifdef PRINT_MSG	     
+#ifdef PRINT_MSG
             if(mpi_rank == 0){
-	    	  std::cout << "step = " << step << std::endl;
+                std::cout << "iter = " << iter << ", step size = " << step << ", fx : " << std::right << std::fixed << fx << std::endl;   
+                std::cout << "(fx - fx_init)/ dg_init = " << (fx - fx_init) / dg_init << std::endl;
             }
 #endif
 
             if(fx > fx_init + step * test_decr || (fx != fx))
             {
                 width = dec;
+#ifdef PRINT_MSG
+                if(mpi_rank == 0){
+                    std::cout << "iter = " << iter << ", first Wolfe condition not met." << std::endl;
+                }
+#endif
             } else {
                 // Armijo condition is met
-                if(param.linesearch == LBFGS_LINESEARCH_BACKTRACKING_ARMIJO)
-                    break;
+                if(param.linesearch == LBFGS_LINESEARCH_BACKTRACKING_ARMIJO){
+#ifdef PRINT_MSG
+                    if(mpi_rank == 0){
+		 	            std::cout << "iter = " << iter << ", accepted step = " << step << std::endl;
+                        std::cout << "theta   : " << std::right << std::fixed << x.transpose() << ",    f_theta : " << std::right << std::fixed << fx << std::endl;	    
+		                std::cout << "grad    : " << grad.transpose() << "\n" << std::endl;
+		    }
+#endif
+		    break;
+		}
 
                 const Scalar dg = grad.dot(drt);
                 if(dg < param.wolfe * dg_init)
                 {
                     width = inc;
+#ifdef PRINT_MSG
+                    if(mpi_rank == 0){
+                        std::cout << "second Wolfe condition not met." << std::endl;
+                        std::cout << "dg = " << dg << ", norm(grad)    : " << grad.norm() << "\n" << std::endl;
+                        std::cout << "dg / dg_init = " << dg / dg_init << std::endl;
+                    }
+
+#endif
+
                 } else {
                     // Regular Wolfe condition is met
                     if(param.linesearch == LBFGS_LINESEARCH_BACKTRACKING_WOLFE)
+#ifdef PRINT_MSG       
+                        if(mpi_rank == 0){
+                            std::cout << "\niter = " << iter << ", accepted step = " << step << std::endl;
+                            std::cout << "theta   : " << std::right << std::fixed << x.transpose() << ",    f_theta : " << std::right << std::fixed << fx << std::endl;
+                            std::cout << "dg = " << dg << ", norm(grad)    : " << grad.norm() << std::endl;
+                            std::cout << "norm(drt) = " << drt.norm() << ", grad    : " << grad.transpose() << std::endl;
+                            std::cout << "dg / dg_init = " << dg / dg_init << ",   - dg_init / (norm(drt) * norm(grad)) = " << - dg / (drt.norm() * grad.norm()) << std::endl;
+                        }
+#endif
                         break;
 
                     if(dg > -param.wolfe * dg_init)
@@ -156,9 +189,17 @@ public:
             step *= width;
         }
 
-        if(iter >= param.max_linesearch)
-		return;
-            //throw std::runtime_error("the line search routine reached the maximum number of iterations");
+        if(iter >= param.max_linesearch){
+#ifdef PRINT_MSG       
+            if(mpi_rank == 0){
+                std::cout << "maximum linesearch iterations reached. max = " << param.max_linesearch << std::endl;
+                //std::cout << "exiting with stepsize = " << step << ", theta = " << x.transpose() << ", f_theta = " << fx << std::endl;
+            	//std::cout << "accept current anyway. theta = " << x.transpose() << ", f_theta = " << fx << std::endl;
+	       }
+#endif
+            throw std::runtime_error("the line search routine reached the maximum number of iterations");
+	       //return;
+        }
     }
 };
 
