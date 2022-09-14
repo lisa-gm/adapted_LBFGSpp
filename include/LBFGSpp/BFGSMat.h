@@ -103,8 +103,9 @@ public:
 
 #ifdef PRINT_MSG
         if(mpi_rank == 0){
+            std::cout << "\n<s,y> / ( ||s||*||y|| ) = " <<  s.dot(y)/(s.norm()*y.norm()) << std::endl;
             //std::cout << "scaling factor for V : " << m_theta << std::endl;
-            std::cout << "V = \n" << m_s << std::endl;
+            //std::cout << "V = \n" << m_s << std::endl;
         }
 #endif
 

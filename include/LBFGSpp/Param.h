@@ -176,7 +176,8 @@ public:
         past           = 0;
         delta          = Scalar(0);
         max_iterations = 0;
-        linesearch     = LBFGS_LINESEARCH_BACKTRACKING_ARMIJO;
+        //linesearch     = LBFGS_LINESEARCH_BACKTRACKING_ARMIJO;
+        linesearch     = LBFGS_LINESEARCH_BACKTRACKING_WOLFE;
         max_linesearch = 20;
         min_step       = Scalar(1e-20);
         max_step       = Scalar(1e+20);
@@ -328,7 +329,8 @@ public:
     ///
     LBFGSBParam()
     {
-        m              = 6;
+        m              = 4;
+        std::cout << "number of stored previous gradients : " << m << std::endl;
         epsilon        = Scalar(1e-5);
         epsilon_rel    = Scalar(1e-5);
         past           = 1;
