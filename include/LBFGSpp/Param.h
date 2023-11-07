@@ -178,7 +178,7 @@ public:
         max_iterations = 0;
         //linesearch     = LBFGS_LINESEARCH_BACKTRACKING_ARMIJO;
         linesearch     = LBFGS_LINESEARCH_BACKTRACKING_WOLFE;
-	max_linesearch = 20;
+	max_linesearch = 50; // 30
         min_step       = Scalar(1e-20);
         max_step       = Scalar(1e+20);
         ftol           = Scalar(1e-4);

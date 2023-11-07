@@ -97,16 +97,17 @@ public:
             std::cout << "lineserach condition : ";
 
             if(m_param.linesearch == 1){            
-                std::cout << "Armijo." << std::endl;
+                std::cout << "Armijo."; // << std::endl;
             }
             else if(m_param.linesearch == 2){
-                std::cout << "Wolfe." << std::endl;
+                std::cout << "Wolfe."; //<< std::endl;
             } else if (m_param.linesearch == 3){
-                std::cout << "Strong Wolfe." << std::endl;
+                std::cout << "Strong Wolfe."; // << std::endl;
             } else {
                 std::cout << "unknown. m_param.linesearch = " << m_param.linesearch << std::endl;
                 exit(1);
             }
+	    std::cout << " m = " << m_param.m << ", delta = " << m_param.delta << ", epsilon = " << m_param.epsilon << ", rel eps = " << m_param.epsilon_rel << ", max iter = " << m_param.max_iterations << std::endl;
         }
 
         // Evaluate function and compute gradient
@@ -173,7 +174,7 @@ public:
             {
                 const Scalar fxd = m_fx[k % fpast];
                 // I CHANGED THIS at time to simply be <= m_param.delta !!
-                if(k >= fpast && abs(fxd - fx) <= m_param.delta){ // * std::max(std::max(abs(fx), abs(fxd)), Scalar(1))){ // ){ 
+                if(k >= fpast && abs(fxd - fx) <= m_param.delta){  // *std::max(std::max(abs(fx), abs(fxd)), Scalar(1))){ // ){ 
 //#ifdef PRINT_MSG
                     if(mpi_rank == 0)
                         std::cout << "convergence criterion met abs(f(x_k) - f(x_k-1)) = " << std::fixed << std::setprecision(8) << abs(fxd - fx) << std::endl;

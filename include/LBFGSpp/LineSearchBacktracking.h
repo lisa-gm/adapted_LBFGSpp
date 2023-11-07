@@ -125,11 +125,11 @@ public:
             if(fx > fx_init + step * test_decr || (fx != fx))
             {
                 width = dec;
-#ifdef PRINT_MSG
+//#ifdef PRINT_MSG
                 if(mpi_rank == 0){
-                    std::cout << "iter = " << iter << ", first Wolfe condition not met." << std::endl;
+                    std::cout << "linsearch iter = " << iter << ", first Wolfe condition not met." << std::endl;
                 }
-#endif
+//#endif
             } else {
                 // Armijo condition is met
                 if(param.linesearch == LBFGS_LINESEARCH_BACKTRACKING_ARMIJO){
@@ -147,14 +147,15 @@ public:
                 if(dg < param.wolfe * dg_init)
                 {
                     width = inc;
-#ifdef PRINT_MSG
+//#ifdef PRINT_MSG
                     if(mpi_rank == 0){
-                        std::cout << "second Wolfe condition not met." << std::endl;
-                        std::cout << "dg = " << dg << ", norm(grad)    : " << grad.norm() << "\n" << std::endl;
-                        std::cout << "dg / dg_init = " << dg / dg_init << std::endl;
+                        std::cout << "linsearch iter = " << iter << ", second Wolfe condition not met." << std::endl;
+			std::cout << "dg: " << dg << ", param.wolfe*dg_init: " << param.wolfe * dg_init << std::endl;
+			//std::cout << "dg = " << dg << ", norm(grad)    : " << grad.norm() << "\n" << std::endl;
+                        //std::cout << "dg / dg_init = " << dg / dg_init << std::endl;
                     }
 
-#endif
+//#endif
 
                 } else {
                     // Regular Wolfe condition is met
