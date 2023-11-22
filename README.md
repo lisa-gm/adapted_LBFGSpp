@@ -1,3 +1,5 @@
+ADAPTED VERSION -- small changes to original repo. Inputs also MPI rank, prints more output.
+
 # LBFGS++ <img src="https://statr.me/images/sticker-lbfgspp.png" alt="LBFGS++" height="150px" align="right" />
 
 > **UPDATE on 2020-03-06**: **LBFGS++** now includes a new L-BFGS-B solver for
