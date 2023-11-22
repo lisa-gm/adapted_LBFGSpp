@@ -1,4 +1,4 @@
-ADAPTED VERSION -- small changes to original repo. Inputs also MPI rank, prints more output.
+ADAPTED VERSION -- small changes to [original](https://github.com/yixuan/LBFGSpp) repo. Inputs also MPI rank, prints more output.
 
 # LBFGS++ <img src="https://statr.me/images/sticker-lbfgspp.png" alt="LBFGS++" height="150px" align="right" />
 
